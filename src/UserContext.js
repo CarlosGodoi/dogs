@@ -1,5 +1,5 @@
 import React from 'react';
-import { TOKEN_POST, TOKEN_VALIDATE_POST, USER_GET } from './api';
+import { TOKEN_POST, TOKEN_VALIDATE_POST, USER_GET } from './Api';
 import { useNavigate } from 'react-router-dom';
 
 export const UserContext = React.createContext();
@@ -29,7 +29,6 @@ export const UserStorage = ({ children }) => {
     const json = await response.json();
     setData(json);
     setLogin(true);
-    console.log(json);
   }
 
   async function userLogin(username, password) {
@@ -38,14 +37,14 @@ export const UserStorage = ({ children }) => {
       setLoading(true);
       const { url, options } = TOKEN_POST({ username, password });
       const tokenRes = await fetch(url, options);
-      if (!tokenRes.ok) throw new Error(`Error: Usuário ou senha inválido`);
+      if (!tokenRes.ok) throw new Error(`Error: ${tokenRes.statusText}`);
       const { token } = await tokenRes.json();
       window.localStorage.setItem('token', token);
       await getUser(token);
       navigate('/conta');
     } catch (err) {
       setError(err.message);
-      setLoading(false);
+      setLogin(false);
     } finally {
       setLoading(false);
     }
@@ -67,6 +66,8 @@ export const UserStorage = ({ children }) => {
         } finally {
           setLoading(false);
         }
+      } else {
+        setLogin(false);
       }
     }
     autoLogin();
